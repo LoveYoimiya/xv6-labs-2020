@@ -80,3 +80,18 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
 }
+
+// 内存使用链表进行管理，因此遍历kmem中的空闲链表就能够获取所有的空闲内存
+void 
+freebytes(uint64* dst)
+{
+  *dst = 0;
+  struct run* p = kmem.freelist;
+
+  acquire(&kmem.lock);
+  while (p) {
+    *dst += PGSIZE;
+    p = p->next;
+  }
+  release(&kmem.lock);
+}
