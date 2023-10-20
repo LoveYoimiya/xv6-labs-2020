@@ -132,3 +132,18 @@ printfinit(void)
   initlock(&pr.lock, "pr");
   pr.locking = 1;
 }
+
+void
+backtrace(void)
+{
+  printf("backtrace:\n");
+  // read the frame pointer now
+  uint64 fp = r_fp();
+  while (PGROUNDUP(fp) - PGROUNDDOWN(fp) == PGSIZE) {
+    // the return address is saved in location that offset -8.
+    uint64 ret_addr = *(uint64*)(fp - 8);
+    printf("%p\n", ret_addr);
+    // the last frame pointer is saved in location that offset -16.
+    fp = *(uint64*)(fp - 16);
+  }
+}
